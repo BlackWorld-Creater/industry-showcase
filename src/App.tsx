@@ -186,10 +186,17 @@ const App: React.FC = () => {
                alt={industries[currentScene].title} 
                className="scene-image" 
                initial={{ scale: 1.1, opacity: 0 }}
-               animate={{ scale: 1.25, opacity: 1 }} // Slower Ken Burns zoom
+               animate={{ 
+                 scale: 1.25, 
+                 opacity: 1,
+                 x: (mousePos.x - window.innerWidth / 2) / 40, // Subtle x parallax
+                 y: (mousePos.y - window.innerHeight / 2) / 40 // Subtle y parallax
+               }} 
                transition={{ 
-                 scale: { duration: 5, ease: 'linear' }, 
-                 opacity: { duration: 1.5 } 
+                 scale: { duration: 8, ease: 'linear' }, 
+                 opacity: { duration: 1.5 },
+                 x: { type: 'spring', damping: 20 },
+                 y: { type: 'spring', damping: 20 }
                }}
                onError={(e) => {
                  (e.target as HTMLImageElement).style.display = 'none';
@@ -199,25 +206,31 @@ const App: React.FC = () => {
             <div className="content-overlay">
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
+                animate={{ 
+                  y: 0, 
+                  opacity: 1,
+                  scale: [1, 1.1, 1],
+                  filter: ["drop-shadow(0 0 5px var(--gold-glow))", "drop-shadow(0 0 20px var(--gold-glow))", "drop-shadow(0 0 5px var(--gold-glow))"]
+                }}
+                transition={{ 
+                  y: { delay: 0.4 },
+                  opacity: { delay: 0.4 },
+                  scale: { repeat: Infinity, duration: 4, ease: "easeInOut" },
+                  filter: { repeat: Infinity, duration: 4, ease: "easeInOut" }
+                }}
                 style={{ color: 'var(--gold)', marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}
               >
                 {industries[currentScene].icon}
               </motion.div>
-              <motion.h2
-                initial={{ y: 20, opacity: 0, letterSpacing: '10px' }}
-                animate={{ y: 0, opacity: 1, letterSpacing: '4px' }}
-                transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
-              >
+              <h2 className="industries-title">
                 {industries[currentScene].title.split('').map((char, index) => (
                   <motion.span
                     key={index}
                     initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{ 
-                      duration: 0.8,
-                      delay: 0.4 + index * 0.12, 
+                      duration: 1.2,
+                      delay: 0.6 + index * 0.12, 
                       ease: "easeOut"
                     }}
                     style={{ 
@@ -229,7 +242,7 @@ const App: React.FC = () => {
                     {char}
                   </motion.span>
                 ))}
-              </motion.h2>
+              </h2>
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
