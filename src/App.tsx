@@ -124,7 +124,7 @@ const App: React.FC = () => {
         }
         return prev + 1;
       });
-    }, 2500); // 2.5s per scene for better viewing
+    }, 4500); // Increased to 4.5s for a more cinematic, slower pace
 
     return () => clearInterval(timer);
   }, [complete]);
@@ -155,14 +155,14 @@ const App: React.FC = () => {
         style={{ top: '20%', left: '20%', background: industries[currentScene].color + '33' }}
       />
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {!complete ? (
           <motion.div
             key={currentScene}
-            initial={{ opacity: 0, filter: 'blur(20px)', scale: 1.1 }}
+            initial={{ opacity: 0, filter: 'blur(30px)', scale: 1.05 }}
             animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
-            exit={{ opacity: 0, filter: 'blur(10px)', scale: 0.95 }}
-            transition={{ duration: 1, ease: 'easeInOut' }}
+            exit={{ opacity: 0, filter: 'blur(20px)', scale: 1.1 }}
+            transition={{ duration: 2, ease: 'easeInOut' }} // Much slower 2s transition
             className="scene active"
           >
             <img 
