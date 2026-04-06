@@ -111,6 +111,15 @@ const App: React.FC = () => {
   const [currentScene, setCurrentScene] = useState(0);
   const [complete, setComplete] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     if (complete) return;
@@ -124,7 +133,7 @@ const App: React.FC = () => {
         }
         return prev + 1;
       });
-    }, 4500); // Increased to 4.5s for a more cinematic, slower pace
+    }, 3500); // Increased to 3.5s for a more cinematic, slower pace
 
     return () => clearInterval(timer);
   }, [complete]);
@@ -142,7 +151,14 @@ const App: React.FC = () => {
 
   return (
     <div className="showcase-container" ref={containerRef}>
+      <motion.div 
+        className="custom-cursor"
+        animate={{ x: mousePos.x, y: mousePos.y }}
+        transition={{ type: 'spring', damping: 20, stiffness: 300, mass: 0.5 }}
+        style={{ borderColor: industries[currentScene].color }}
+      />
       <div className="scanlines"></div>
+      <div className="noise"></div>
       
       {/* Dynamic Background Glow */}
       <motion.div 
@@ -165,10 +181,16 @@ const App: React.FC = () => {
             transition={{ duration: 2, ease: 'easeInOut' }} // Much slower 2s transition
             className="scene active"
           >
-            <img 
+            <motion.img 
                src={industries[currentScene].image} 
                alt={industries[currentScene].title} 
                className="scene-image" 
+               initial={{ scale: 1.1, opacity: 0 }}
+               animate={{ scale: 1.25, opacity: 1 }} // Slower Ken Burns zoom
+               transition={{ 
+                 scale: { duration: 5, ease: 'linear' }, 
+                 opacity: { duration: 1.5 } 
+               }}
                onError={(e) => {
                  (e.target as HTMLImageElement).style.display = 'none';
                }}
@@ -184,11 +206,29 @@ const App: React.FC = () => {
                 {industries[currentScene].icon}
               </motion.div>
               <motion.h2
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
+                initial={{ y: 20, opacity: 0, letterSpacing: '10px' }}
+                animate={{ y: 0, opacity: 1, letterSpacing: '4px' }}
+                transition={{ duration: 1.2, delay: 0.2, ease: 'easeOut' }}
               >
-                {industries[currentScene].title}
+                {industries[currentScene].title.split('').map((char, index) => (
+                  <motion.span
+                    key={index}
+                    initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    transition={{ 
+                      duration: 0.8,
+                      delay: 0.4 + index * 0.12, 
+                      ease: "easeOut"
+                    }}
+                    style={{ 
+                      display: 'inline-block', 
+                      color: char === ' ' ? 'transparent' : 'var(--gold)',
+                      whiteSpace: 'pre'
+                    }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}
